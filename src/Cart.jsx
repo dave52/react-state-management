@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useMemo } from "react";
 import useFetchAll from "./services/useFetchAll";
 import Spinner from "./Spinner";
 
 export default function Cart({ cart, updateQuantity }) {
   const urls = cart.map((i) => `products/${i.id}`);
   const { data: products, loading, error } = useFetchAll(urls);
+
+  function renderCardHeader() {}
 
   function renderItem(itemInCart) {
     const { id, sku, quantity } = itemInCart;
@@ -39,12 +41,22 @@ export default function Cart({ cart, updateQuantity }) {
     );
   }
 
+  const numItemsInCart = useMemo(
+    () => cart.reduce((total, item) => total + item.quantity, 0),
+    [cart]
+  );
+
   if (loading) return <Spinner />;
   if (error) throw error;
 
   return (
     <section id="cart">
-      <h1>Cart</h1>
+      <h1>
+        {numItemsInCart === 0
+          ? "Your cart is empty"
+          : `${numItemsInCart} Item${numItemsInCart > 1 ? "s" : ""} in My Cart`}
+      </h1>
+      {cart.map(renderCardHeader)}
       <ul>{cart.map(renderItem)}</ul>
     </section>
   );
